@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import GroupDetails from './pages/GroupDetails';
 import { AuthProvider, useAuth } from './context/AuthProvider';
 
 function PrivateRoute({ children }: { children: React.ReactElement }) {
@@ -24,6 +25,14 @@ function AppContent() {
           element={
             <PrivateRoute>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/group/:id"
+          element={
+            <PrivateRoute>
+              <GroupDetails />
             </PrivateRoute>
           }
         />

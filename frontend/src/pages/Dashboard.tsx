@@ -34,10 +34,10 @@ export default function Dashboard() {
     const [creating, setCreating] = useState(false);
 
     useEffect(() => {
-        fetchGroups();
+        fetchData();
     }, [session]);
 
-    const fetchGroups = async () => {
+    const fetchData = async () => {
         if (!session) return;
         try {
             // We need to use the token from Supabase session for our backend
@@ -49,8 +49,16 @@ export default function Dashboard() {
             if (data.status === 'success') {
                 setGroups(data.data.groups);
             }
+            // Fetch Balances
+            const balRes = await fetch('/api/balances/summary', {
+                headers: { 'Authorization': `Bearer ${access_token}` }
+            });
+            const balData = await balRes.json();
+            if (balData.status === 'success') {
+                setBalances(balData.data);
+            }
         } catch (e) {
-            console.error("Failed to fetch groups", e);
+            console.error("Failed to fetch data", e);
         } finally {
             setLoading(false);
         }
@@ -110,7 +118,7 @@ export default function Dashboard() {
                 setShowModal(false);
                 setNewGroupName('');
                 setSelectedMembers([]);
-                fetchGroups(); // Refresh list
+                fetchData(); // Refresh list
             }
         } catch (e) {
             alert('Failed to create group');

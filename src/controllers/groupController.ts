@@ -1,3 +1,4 @@
+
 import { Request, Response, NextFunction } from 'express';
 import prisma from '../config/prisma';
 import { AppError } from '../utils/AppError';
@@ -19,7 +20,7 @@ export const createGroup = async (req: AuthRequest, res: Response, next: NextFun
                 members: {
                     create: [
                         { userId: userId }, // Add creator
-                        ...([...new Set(members || [])] // Deduplicate
+                        ...([...new Set((members as string[]) || [])] // Deduplicate and cast
                             .filter((id: string) => id !== userId) // Remove creator if present
                             .map((id: string) => ({ userId: id })))
                     ]
