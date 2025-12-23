@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  createdGroups Group[] @relation("CreatedGroups")
+  memberships   GroupMember[]
+  expensesPaid  Expense[]
+  splits        Split[]
+  
+  lendingBalances Balance[] @relation("LenderBalance")
+  borrowingBalances Balance[] @relation("BorrowerBalance")
+  
+  paymentsMade     Settlement[] @relation("PayerSettlement")
+  paymentsReceived Settlement[] @relation("PayeeSettlement")
+
+  @@map("users")
+}
+
+model Group {
+  id        String   @id @default(uuid())
+  name      String
+  createdBy String   @map("created_by")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  creator   User     @relation("CreatedGroups", fields: [createdBy], references: [id])
+  members   GroupMember[]
+  expenses  Expense[]
+  balances  Balance[]
+  settlements Settlement[]
+
+  @@map("groups")
+}
+
+model GroupMember {
+  groupId  String   @map("group_id")
+  userId   String   @map("user_id")
+  joinedAt DateTime @default(now()) @map("joined_at")
+
+  group    Group    @relation(fields: [groupId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
+
+  @@id([groupId, userId])
+  @@map("group_members")
+}
+
+enum SplitType {
+  EQUAL
+  EXACT
+  PERCENT
+}
+
+model Expense {
+  id          String    @id @default(uuid())
+  groupId     String    @map("group_id")
+  payerId     String    @map("payer_id")
+  amount      Decimal   @db.Decimal(10, 2)
+  description String
+  splitType   SplitType @map("split_type")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  isArchived  Boolean   @default(false) @map("is_archived")
+
+  group       Group     @relation(fields: [groupId], references: [id])
+  payer       User      @relation(fields: [payerId], references: [id])
+  splits      Split[]
+
+  @@map("expenses")
+}
+
+model Split {
+  expenseId String  @map("expense_id")
+  userId    String  @map("user_id")
+  amount    Decimal @db.Decimal(10, 2)
+  
+  expense   Expense @relation(fields: [expenseId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@id([expenseId, userId])
+  @@map("splits")
+}
+
+model Balance {
+  groupId    String  @map("group_id")
+  lenderId   String  @map("lender_id")
+  borrowerId String  @map("borrower_id")
+  amount     Decimal @db.Decimal(10, 2)
+
+  group    Group @relation(fields: [groupId], references: [id])
+  lender   User  @relation("LenderBalance", fields: [lenderId], references: [id])
+  borrower User  @relation("BorrowerBalance", fields: [borrowerId], references: [id])
+
+  @@id([groupId, lenderId, borrowerId])
+  @@map("balances")
+}
+
+model Settlement {
+  id        String   @id @default(uuid())
+  groupId   String   @map("group_id")
+  payerId   String   @map("payer_id")
+  payeeId   String   @map("payee_id")
+  amount    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  group     Group @relation(fields: [groupId], references: [id])
+  payer     User  @relation("PayerSettlement", fields: [payerId], references: [id])
+  payee     User  @relation("PayeeSettlement", fields: [payeeId], references: [id])
+
+  @@map("settlements")
+}
