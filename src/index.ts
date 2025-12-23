@@ -7,6 +7,8 @@ import authRoutes from './routes/authRoutes';
 import groupRoutes from './routes/groupRoutes';
 import expenseRoutes from './routes/expenseRoutes';
 import userRoutes from './routes/userRoutes';
+import balanceRoutes from './routes/balanceRoutes';
+import settlementRoutes from './routes/settlementRoutes';
 
 const app = express();
 
@@ -22,6 +24,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/balances', balanceRoutes);
+app.use('/api/settlements', settlementRoutes);
 
 // Health Check
 app.get('/health', (req, res) => {

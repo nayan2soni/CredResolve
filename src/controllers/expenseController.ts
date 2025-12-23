@@ -102,13 +102,11 @@ export const addExpense = async (req: AuthRequest, res: Response, next: NextFunc
     }
 };
 
-// Helper to update balances (Placeholder for now, will implement Algorithm next)
+// Helper to update balances
 async function updateBalances(tx: Prisma.TransactionClient, groupId: string) {
-    // This is where the magic happens (Algorithm to be implemented in next step)
-    // We will implement the 'Balance Simplification' logic here.
-    // 1. Fetch all expenses in group
-    // 2. Calculate net flow for each user
-    // 3. Simplify and update Balance table
+    // Use the service
+    const { updateBalances: serviceUpdate } = await import('../services/balanceService');
+    await serviceUpdate(tx, groupId);
 }
 
 export const getGroupExpenses = async (req: AuthRequest, res: Response, next: NextFunction) => {
