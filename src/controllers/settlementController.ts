@@ -3,6 +3,7 @@ import prisma from '../config/prisma';
 import { AppError } from '../utils/AppError';
 import { AuthRequest } from '../middleware/auth';
 import { updateBalances } from '../services/balanceService';
+import { logAction } from '../services/auditService';
 
 export const addSettlement = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -36,6 +37,11 @@ export const addSettlement = async (req: AuthRequest, res: Response, next: NextF
             await updateBalances(tx, groupId);
 
             return newSettlement;
+        });
+
+        logAction('SETTLEMENT_ADDED', settlement.id, 'SETTLEMENT', payerId, {
+            amount,
+            payeeId
         });
 
         res.status(201).json({

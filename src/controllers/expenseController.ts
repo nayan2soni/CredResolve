@@ -3,6 +3,7 @@ import prisma from '../config/prisma';
 import { AppError } from '../utils/AppError';
 import { AuthRequest } from '../middleware/auth';
 import { Prisma } from '@prisma/client';
+import { logAction } from '../services/auditService';
 
 export const addExpense = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
@@ -91,6 +92,9 @@ export const addExpense = async (req: AuthRequest, res: Response, next: NextFunc
 
             return newExpense;
         });
+
+        // Logging after transaction to not block/fail essential flow
+        logAction('EXPENSE_CREATED', expense.id, 'EXPENSE', userId, { amount, description, splitType });
 
         res.status(201).json({
             status: 'success',

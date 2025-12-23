@@ -22,6 +22,7 @@ model User {
   
   paymentsMade     Settlement[] @relation("PayerSettlement")
   paymentsReceived Settlement[] @relation("PayeeSettlement")
+  auditLogs        AuditLog[]
 
   @@map("users")
 }
@@ -115,4 +116,18 @@ model Settlement {
   payee     User  @relation("PayeeSettlement", fields: [payeeId], references: [id])
 
   @@map("settlements")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  action    String   // EXPENSE_CREATED, SETTLEMENT_ADDED, BALANCE_UPDATED
+  entityId  String   @map("entity_id") // ID of the expense/settlement/group
+  entityType String  @map("entity_type") // EXPENSE, SETTLEMENT, GROUP
+  actorId   String   @map("actor_id")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  actor     User     @relation(fields: [actorId], references: [id])
+
+  @@map("audit_logs")
 }
