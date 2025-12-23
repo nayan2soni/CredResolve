@@ -19,7 +19,9 @@ export const createGroup = async (req: AuthRequest, res: Response, next: NextFun
                 members: {
                     create: [
                         { userId: userId }, // Add creator
-                        ...(members || []).map((id: string) => ({ userId: id })) // Add other members
+                        ...([...new Set(members || [])] // Deduplicate
+                            .filter((id: string) => id !== userId) // Remove creator if present
+                            .map((id: string) => ({ userId: id })))
                     ]
                 }
             },
