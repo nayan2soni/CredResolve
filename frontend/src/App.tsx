@@ -43,23 +43,6 @@ function App() {
   );
 }
 
-function App() {
-  const isAuthenticated = !!localStorage.getItem('currentUser');
 
-  return (
-    <Router>
-      <div className="app-container">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/dashboard"
-            element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-          />
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </div>
-    </Router>
-  );
-}
 
 export default App;
