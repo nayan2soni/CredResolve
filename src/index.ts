@@ -4,8 +4,9 @@ import morgan from 'morgan';
 import { errorHandler } from './middleware/errorHandler';
 // Routes
 import authRoutes from './routes/authRoutes';
-// import groupRoutes from './routes/groupRoutes';
-// import expenseRoutes from './routes/expenseRoutes';
+import groupRoutes from './routes/groupRoutes';
+import expenseRoutes from './routes/expenseRoutes';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
 
@@ -18,8 +19,9 @@ if (process.env.NODE_ENV === 'development') {
 
 // Routes
 app.use('/api/auth', authRoutes);
-// app.use('/api/groups', groupRoutes);
-// app.use('/api/expenses', expenseRoutes);
+app.use('/api/groups', groupRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/users', userRoutes);
 
 // Health Check
 app.get('/health', (req, res) => {
