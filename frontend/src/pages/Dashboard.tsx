@@ -171,7 +171,12 @@ export default function Dashboard() {
                             <p className="text-muted">No groups yet. Create one to get started!</p>
                         </div>
                     ) : groups.map(group => (
-                        <div key={group.id} className="card" style={{ cursor: 'pointer' /* navigate to detail */ }}>
+                        <div
+                            key={group.id}
+                            className="card"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => navigate(`/group/${group.id}`)}
+                        >
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                                 <h3 style={{ fontSize: '1.125rem' }}>{group.name}</h3>
                                 <Users size={16} className="text-muted" />
