@@ -23,7 +23,7 @@ app.use(cors({
     optionsSuccessStatus: 204,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.options('*', cors()); // Enable pre-flight across-the-board
+// app.options('*', cors()); // Removed: Incompatible with Express 5 wildcard syntax. app.use(cors()) handles preflight.
 app.use(morgan('dev'));
 app.use(express.json());
 
