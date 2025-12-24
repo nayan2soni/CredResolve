@@ -40,6 +40,27 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'ok' });
 });
 
+app.get('/api/debug-db', async (req, res) => {
+    try {
+        const { PrismaClient } = await import('@prisma/client');
+        const prisma = new PrismaClient();
+        await prisma.$connect();
+        const userCount = await prisma.user.count();
+        res.status(200).json({ status: 'ok', message: 'Connected to DB', userCount });
+    } catch (error: any) {
+        console.error('DB Connection Failed:', error);
+        res.status(500).json({
+            status: 'error',
+            message: error.message,
+            stack: error.stack,
+            env: {
+                hasDbUrl: !!process.env.DATABASE_URL,
+                nodeVersion: process.version
+            }
+        });
+    }
+});
+
 // Error Handling
 app.use(errorHandler);
 
