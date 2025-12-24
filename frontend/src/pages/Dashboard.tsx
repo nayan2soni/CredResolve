@@ -1,8 +1,7 @@
 
 import { useEffect, useState } from 'react';
-import { LogOut, Users, CreditCard, DollarSign, Plus, X, Search } from 'lucide-react';
+import { LogOut, Users, CreditCard, DollarSign, Plus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
 import api from '../lib/axios';
 import { useAuth } from '../context/AuthProvider';
 
