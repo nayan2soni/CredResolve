@@ -1,4 +1,11 @@
 
-import app from '../src/app';
+const app = require('../src/app').default;
 
-export default app;
+// Log initialization
+console.log('Serverless Function Initialized');
+
+module.exports = (req: any, res: any) => {
+    // Vercel handling
+    console.log(`[${req.method}] ${req.url}`);
+    return app(req, res);
+};
