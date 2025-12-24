@@ -41,15 +41,18 @@ export default function Dashboard() {
     const fetchData = async () => {
         if (!session) return;
         try {
-            // We need to use the token from Supabase session for our backend (handled by axios interceptor)
-            const { data: groupsData } = await api.get('/groups');
-            if (groupsData.status === 'success') {
-                setGroups(groupsData.data.groups);
+            // Parallelize requests to improve performance
+            // Fetch Groups and Balances concurrently
+            const [groupsRes, balancesRes] = await Promise.all([
+                api.get('/groups'),
+                api.get('/balances/summary')
+            ]);
+
+            if (groupsRes.data.status === 'success') {
+                setGroups(groupsRes.data.data.groups);
             }
-            // Fetch Balances
-            const { data: balData } = await api.get('/balances/summary');
-            if (balData.status === 'success') {
-                setBalances(balData.data);
+            if (balancesRes.data.status === 'success') {
+                setBalances(balancesRes.data.data);
             }
         } catch (e) {
             console.error("Failed to fetch data", e);

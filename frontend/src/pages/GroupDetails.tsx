@@ -60,14 +60,14 @@ export default function GroupDetails() {
 
     const fetchData = async () => {
         try {
-            // Fetch Group Info
-            const { data: groupData } = await api.get(`/groups/${id}`);
+            // Parallel fetch
+            const [groupRes, expenseRes] = await Promise.all([
+                api.get(`/groups/${id}`),
+                api.get(`/expenses/group/${id}`)
+            ]);
 
-            // Fetch Expenses
-            const { data: expenseData } = await api.get(`/expenses/group/${id}`);
-
-            if (groupData.status === 'success') setGroup(groupData.data.group);
-            if (expenseData.status === 'success') setExpenses(expenseData.data.expenses);
+            if (groupRes.data.status === 'success') setGroup(groupRes.data.data.group);
+            if (expenseRes.data.status === 'success') setExpenses(expenseRes.data.data.expenses);
 
         } catch (e) {
             console.error(e);
