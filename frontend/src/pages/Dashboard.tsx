@@ -91,27 +91,18 @@ export default function Dashboard() {
         e.preventDefault();
         setCreating(true);
         try {
-            const { access_token } = session!;
-            const res = await fetch('/api/groups', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${access_token}`
-                },
-                body: JSON.stringify({
-                    name: newGroupName,
-                    members: selectedMembers.map(m => m.id)
-                })
+            await api.post('/groups', {
+                name: newGroupName,
+                members: selectedMembers.map(m => m.id)
             });
-            const data = await res.json();
-            if (data.status === 'success') {
-                setShowModal(false);
-                setNewGroupName('');
-                setSelectedMembers([]);
-                fetchData(); // Refresh list
-            }
-        } catch (e) {
-            alert('Failed to create group');
+
+            setShowModal(false);
+            setNewGroupName('');
+            setSelectedMembers([]);
+            fetchData(); // Refresh list
+        } catch (e: any) {
+            console.error('Create group failed:', e);
+            alert(e.response?.data?.message || 'Failed to create group');
         } finally {
             setCreating(false);
         }
