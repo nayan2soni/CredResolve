@@ -16,7 +16,14 @@ const app = express();
 // ... Middleware ... 
 
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: '*', // Allow all origins for now (or exact frontend URL if needed)
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors()); // Enable pre-flight across-the-board
 app.use(morgan('dev'));
 app.use(express.json());
 
