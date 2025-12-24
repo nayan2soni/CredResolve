@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import api from '../lib/axios';
 import type { Session, User } from '@supabase/supabase-js';
 
 type AuthContextType = {
@@ -40,17 +41,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                 const { user } = session;
                 if (user.user_metadata?.username) {
                     try {
-                        await fetch('/api/auth/sync', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Authorization': `Bearer ${session.access_token}`
-                            },
-                            body: JSON.stringify({
-                                id: user.id,
-                                email: user.email,
-                                username: user.user_metadata.username
-                            })
+                        await api.post('/auth/sync', {
+                            id: user.id,
+                            email: user.email,
+                            username: user.user_metadata.username
                         });
                     } catch (e) {
                         console.error("Sync failed", e);

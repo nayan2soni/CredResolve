@@ -1,8 +1,8 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus, DollarSign, User, Calendar, Receipt } from 'lucide-react';
+import { ArrowLeft, Plus, Receipt } from 'lucide-react';
 import { useAuth } from '../context/AuthProvider';
+import api from '../lib/axios';
 
 type Member = { userId: string, user: { id: string, username: string, email: string } };
 type Expense = {
@@ -37,18 +37,11 @@ export default function GroupDetails() {
 
     const fetchData = async () => {
         try {
-            const { access_token } = session!;
             // Fetch Group Info
-            const groupRes = await fetch(`/api/groups/${id}`, {
-                headers: { 'Authorization': `Bearer ${access_token}` }
-            });
-            const groupData = await groupRes.json();
+            const { data: groupData } = await api.get(`/groups/${id}`);
 
             // Fetch Expenses
-            const expenseRes = await fetch(`/api/expenses/group/${id}`, {
-                headers: { 'Authorization': `Bearer ${access_token}` }
-            });
-            const expenseData = await expenseRes.json();
+            const { data: expenseData } = await api.get(`/expenses/group/${id}`);
 
             if (groupData.status === 'success') setGroup(groupData.data.group);
             if (expenseData.status === 'success') setExpenses(expenseData.data.expenses);
@@ -64,34 +57,25 @@ export default function GroupDetails() {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const { access_token } = session!;
             // Default split logic: EQUAL among all members
             const memberIds = group.members.map((m: Member) => m.userId);
 
-            const res = await fetch('/api/expenses', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${access_token}`
-                },
-                body: JSON.stringify({
-                    groupId: id,
-                    amount: parseFloat(amount),
-                    description,
-                    splitType: 'EQUAL',
-                    payerId: session?.user.id, // Current user pays
-                    splits: memberIds // Everyone splits
-                })
+            const { data: responseData } = await api.post('/expenses', {
+                groupId: id,
+                amount: parseFloat(amount),
+                description,
+                splitType: 'EQUAL',
+                payerId: session?.user.id, // Current user pays
+                splits: memberIds // Everyone splits
             });
 
-            const data = await res.json();
-            if (data.status === 'success') {
+            if (responseData.status === 'success') {
                 setShowModal(false);
                 setAmount('');
                 setDescription('');
                 fetchData(); // Refresh
             } else {
-                alert(data.message || 'Failed to add expense');
+                alert(responseData.message || 'Failed to add expense');
             }
         } catch (e) {
             alert('Error adding expense');

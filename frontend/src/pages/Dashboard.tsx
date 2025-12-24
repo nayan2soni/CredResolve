@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { LogOut, Users, CreditCard, DollarSign, Plus, X, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import api from '../lib/axios';
 import { useAuth } from '../context/AuthProvider';
 
 type Group = {
@@ -23,6 +24,7 @@ export default function Dashboard() {
     const navigate = useNavigate();
 
     const [groups, setGroups] = useState<Group[]>([]);
+    const [balances, setBalances] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
     // Create Group Modal State
@@ -40,20 +42,13 @@ export default function Dashboard() {
     const fetchData = async () => {
         if (!session) return;
         try {
-            // We need to use the token from Supabase session for our backend
-            const { access_token } = session!;
-            const res = await fetch('/api/groups', {
-                headers: { 'Authorization': `Bearer ${access_token}` }
-            });
-            const data = await res.json();
-            if (data.status === 'success') {
-                setGroups(data.data.groups);
+            // We need to use the token from Supabase session for our backend (handled by axios interceptor)
+            const { data: groupsData } = await api.get('/groups');
+            if (groupsData.status === 'success') {
+                setGroups(groupsData.data.groups);
             }
             // Fetch Balances
-            const balRes = await fetch('/api/balances/summary', {
-                headers: { 'Authorization': `Bearer ${access_token}` }
-            });
-            const balData = await balRes.json();
+            const { data: balData } = await api.get('/balances/summary');
             if (balData.status === 'success') {
                 setBalances(balData.data);
             }
@@ -72,11 +67,7 @@ export default function Dashboard() {
         }
 
         try {
-            const { access_token } = session!;
-            const res = await fetch(`/api/users/search?q=${q}`, {
-                headers: { 'Authorization': `Bearer ${access_token}` }
-            });
-            const data = await res.json();
+            const { data } = await api.get(`/users/search?q=${q}`);
             // Filter out already selected users
             const results = data.data.users.filter((u: UserResult) =>
                 !selectedMembers.find(selected => selected.id === u.id)
@@ -161,13 +152,13 @@ export default function Dashboard() {
                 <StatCard
                     icon={<DollarSign size={24} color="#34d399" />}
                     label="You are Owed"
-                    value="₹--"
+                    value={`₹${balances?.totalOwed?.toFixed(2) || '0.00'}`}
                     highlight={true}
                 />
                 <StatCard
                     icon={<CreditCard size={24} color="#f87171" />}
                     label="You Owe"
-                    value="₹--"
+                    value={`₹${balances?.totalDebt?.toFixed(2) || '0.00'}`}
                 />
             </div>
 
