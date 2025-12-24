@@ -79,7 +79,10 @@ export const addExpense = async (req: AuthRequest, res: Response, next: NextFunc
                     }
                 },
                 include: {
-                    splits: true
+                    splits: true,
+                    payer: {
+                        select: { id: true, username: true }
+                    }
                 }
             });
 

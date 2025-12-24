@@ -124,7 +124,8 @@ export default function GroupDetails() {
                 setAmount('');
                 setDescription('');
                 setSplitType('EQUAL');
-                fetchData();
+                // Optmized: Update local state instead of re-fetching
+                setExpenses([responseData.data.expense, ...expenses]);
             } else {
                 alert(responseData.message || 'Failed to add expense');
             }
