@@ -24,7 +24,8 @@ export const errorHandler = (err: any, req: Request, res: Response, next: NextFu
             console.error('ERROR 💥', err);
             res.status(500).json({
                 status: 'error',
-                message: 'Something went very wrong!'
+                message: err.message, // Temporarily exposing error message
+                stack: err.stack // Temporarily exposing stack
             });
         }
     }
